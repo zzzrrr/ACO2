@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CO2, Temperature, and Humidity Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 90%;
+        }
+        .panel {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+        .panel h2 {
+            margin: 0;
+            font-size: 24px;
+            color: #333;
+        }
+        .panel p {
+            font-size: 48px;
+            color: #007bff;
+            margin: 10px 0 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard">
+    <div class="panel">
+        <h2>1號機 CO2值(PPM)</h2>
+        <p id="device1-co2">--</p>
+        <h2>溫度(C)</h2>
+        <p id="device1-temp">--</p>
+        <h2>濕度(%)</h2>
+        <p id="device1-hum">--</p>
+    </div>
+    <div class="panel">
+        <h2>2號機 CO2值(PPM)</h2>
+        <p id="device2-co2">--</p>
+        <h2>溫度(C)</h2>
+        <p id="device2-temp">--</p>
+        <h2>濕度(%)</h2>
+        <p id="device2-hum">--</p>
+    </div>
+    <div class="panel">
+        <h2>3號機 CO2值(PPM)</h2>
+        <p id="device3-co2">--</p>
+        <h2>溫度(C)</h2>
+        <p id="device3-temp">--</p>
+        <h2>濕度(%)</h2>
+        <p id="device3-hum">--</p>
+    </div>
+    <div class="panel">
+        <h2>4號機 CO2值(PPM)</h2>
+        <p id="device4-co2">--</p>
+        <h2>溫度(C)</h2>
+        <p id="device4-temp">--</p>
+        <h2>濕度(%)</h2>
+        <p id="device4-hum">--</p>
+    </div>
+    <div class="panel">
+        <h2>5號機 CO2值(PPM)</h2>
+        <p id="device5-co2">--</p>
+        <h2>溫度(C)</h2>
+        <p id="device5-temp">--</p>
+        <h2>濕度(%)</h2>
+        <p id="device5-hum">--</p>
+    </div>
+</div>
+
+<script>
+    const deviceKeys = [
+        'H2L5KKEW7KD3ZQRB',
+        'E59K4AJSIS1T7LGB',
+        'YMKRT8OH381DHEQR',
+        'EA4ULMYLJVHE47ES',
+        'SSB0FBM8I6NGDEUY'
+    ];
+
+    const channelIds = [
+        '2017546',  // 替換為實際的Channel ID
+        '2053494',  // 替換為實際的Channel ID
+        '2574052',  // 替換為實際的Channel ID
+        '2574054',  // 替換為實際的Channel ID
+        '2574055'   // 替換為實際的Channel ID
+    ];
+
+    const co2Ids = [
+        'device1-co2',
+        'device2-co2',
+        'device3-co2',
+        'device4-co2',
+        'device5-co2'
+    ];
+
+    const tempIds = [
+        'device1-temp',
+        'device2-temp',
+        'device3-temp',
+        'device4-temp',
+        'device5-temp'
+    ];
+
+    const humIds = [
+        'device1-hum',
+        'device2-hum',
+        'device3-hum',
+        'device4-hum',
+        'device5-hum'
+    ];
+
+    function fetchData() {
+        deviceKeys.forEach((key, index) => {
+            const channelId = channelIds[index];
+            fetch(`https://api.thingspeak.com/channels/${channelId}/feeds.json?api_key=${key}&results=1`)
+                .then(response => response.json())
+                .then(data => {
+                    const feeds = data.feeds;
+                    if (feeds.length) {
+                        const latestData = feeds[0];
+                        document.getElementById(co2Ids[index]).innerText = latestData.field1 || '--';
+                        document.getElementById(tempIds[index]).innerText = latestData.field2 || '--';
+                        document.getElementById(humIds[index]).innerText = latestData.field3 || '--';
+                    } else {
+                        document.getElementById(co2Ids[index]).innerText = '--';
+                        document.getElementById(tempIds[index]).innerText = '--';
+                        document.getElementById(humIds[index]).innerText = '--';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        });
+    }
+
+    setInterval(fetchData, 20000); // Fetch data every 10 seconds
+    fetchData(); // Initial fetch
+</script>
+
+</body>
+</html>
